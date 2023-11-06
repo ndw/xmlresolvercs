@@ -48,8 +48,6 @@ namespace Org.XmlResolver.Loaders {
                 if (_loaderResolver == null) {
                     XmlResolverConfiguration config = new XmlResolverConfiguration(new List<Uri>(), new List<string>());
                     config.SetFeature(ResolverFeature.PREFER_PUBLIC, true);
-                    config.SetFeature(ResolverFeature.CACHE_DIRECTORY, null);
-                    config.SetFeature(ResolverFeature.CACHE_UNDER_HOME, false);
                     config.SetFeature(ResolverFeature.ALLOW_CATALOG_PI, false);
                     config.AddAssemblyCatalog("Org.XmlResolver.catalog.xml", Assembly.GetExecutingAssembly());
                     _loaderResolver = new Resolver(config);

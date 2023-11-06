@@ -32,16 +32,12 @@ namespace UnitTests {
             XmlResolverConfiguration config = new XmlResolverConfiguration(new List<Uri>(), new List<string>());
             config.SetFeature(ResolverFeature.CATALOG_FILES, catlist);
             config.SetFeature(ResolverFeature.URI_FOR_SYSTEM, true);
-            config.SetFeature(ResolverFeature.CACHE, null);
-            config.SetFeature(ResolverFeature.CACHE_UNDER_HOME, false);
             config.SetFeature(ResolverFeature.MERGE_HTTPS, true);
             mergeManager = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
 
             config = new XmlResolverConfiguration(new List<Uri>(), new List<string>());
             config.SetFeature(ResolverFeature.CATALOG_FILES, catlist);
             config.SetFeature(ResolverFeature.URI_FOR_SYSTEM, true);
-            config.SetFeature(ResolverFeature.CACHE, null);
-            config.SetFeature(ResolverFeature.CACHE_UNDER_HOME, false);
             config.SetFeature(ResolverFeature.MERGE_HTTPS, false);
             noMergeManager = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
         }

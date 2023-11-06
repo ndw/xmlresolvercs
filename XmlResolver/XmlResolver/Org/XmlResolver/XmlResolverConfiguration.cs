@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Configuration;
 using NLog;
-using Org.XmlResolver.Cache;
 using Org.XmlResolver.Features;
 using Org.XmlResolver.Utils;
 
@@ -101,8 +100,7 @@ namespace Org.XmlResolver {
 
         private static List<ResolverFeature> knownFeatures = new() {
             ResolverFeature.CATALOG_FILES, ResolverFeature.PREFER_PUBLIC, ResolverFeature.PREFER_PROPERTY_FILE,
-            ResolverFeature.ALLOW_CATALOG_PI, ResolverFeature.CATALOG_ADDITIONS, ResolverFeature.CACHE_DIRECTORY,
-            ResolverFeature.CACHE_UNDER_HOME, ResolverFeature.CACHE, ResolverFeature.CACHE_ENABLED,
+            ResolverFeature.ALLOW_CATALOG_PI, ResolverFeature.CATALOG_ADDITIONS,
             ResolverFeature.MERGE_HTTPS, ResolverFeature.MASK_PACK_URIS,
             ResolverFeature.CATALOG_MANAGER, ResolverFeature.URI_FOR_SYSTEM, ResolverFeature.CATALOG_LOADER_CLASS,
             ResolverFeature.PARSE_RDDL, ResolverFeature.ASSEMBLY_CATALOGS, ResolverFeature.ARCHIVED_CATALOGS,
@@ -119,10 +117,6 @@ namespace Org.XmlResolver {
         private bool preferPublic = ResolverFeature.PREFER_PUBLIC.GetDefaultValue();
         private bool preferPropertyFile = ResolverFeature.PREFER_PROPERTY_FILE.GetDefaultValue();
         private bool allowCatalogPI = ResolverFeature.ALLOW_CATALOG_PI.GetDefaultValue();
-        private string cacheDirectory = ResolverFeature.CACHE_DIRECTORY.GetDefaultValue();
-        private bool cacheUnderHome = ResolverFeature.CACHE_UNDER_HOME.GetDefaultValue();
-        private ResourceCache cache = ResolverFeature.CACHE.GetDefaultValue(); // null
-        private bool cacheEnabled = ResolverFeature.CACHE_ENABLED.GetDefaultValue();
         private CatalogManager manager = ResolverFeature.CATALOG_MANAGER.GetDefaultValue(); // also null
         private bool uriForSystem = ResolverFeature.URI_FOR_SYSTEM.GetDefaultValue();
         private bool mergeHttps = ResolverFeature.MERGE_HTTPS.GetDefaultValue();
@@ -193,10 +187,6 @@ namespace Org.XmlResolver {
             preferPublic = current.preferPublic;
             preferPropertyFile = current.preferPropertyFile;
             allowCatalogPI = current.allowCatalogPI;
-            cacheDirectory = current.cacheDirectory;
-            cacheUnderHome = current.cacheUnderHome;
-            cache = current.cache;
-            cacheEnabled = current.cacheEnabled;
             if (current.manager == null) {
                 manager = null;
             } else {
@@ -328,16 +318,6 @@ namespace Org.XmlResolver {
             SetBoolean("XML_CATALOG_PREFER_PROPERTY_FILE", "Prefer propertyFile: {0}", ref preferPropertyFile);
             SetBoolean("XML_CATALOG_ALLOW_PI", "Allow catalog PI: {0}", ref allowCatalogPI);
 
-            property = Environment.GetEnvironmentVariable("XML_CATALOG_CACHE");
-            if (property != null) {
-                if (showConfigChanges) {
-                    logger.Log(ResolverLogger.CONFIG, "Cache directory: {0}", property);
-                }
-                cacheDirectory = property;
-            }
-
-            SetBoolean("XML_CATALOG_CACHE_UNDER_HOME", "Cache under home: {0}", ref cacheUnderHome);
-            SetBoolean("XML_CATALOG_CACHE_ENABLED", "Cache enabled: {0}", ref cacheEnabled);
             SetBoolean("XML_CATALOG_URI_FOR_SYSTEM", "URI-for-system: {0}", ref uriForSystem);
             SetBoolean("XML_CATALOG_MERGE_HTTPS", "Merge https: {0}", ref mergeHttps);
             SetBoolean("XML_CATALOG_MASK_PACK_URIS", "Mask-pack-URIs: {0}", ref maskPackUris);
@@ -442,16 +422,6 @@ namespace Org.XmlResolver {
             SetPropertyBoolean(section.GetSection("preferPropertyFile"), "Prefer propertyFile: {0}", ref preferPropertyFile);
             SetPropertyBoolean(section.GetSection("allowOasisXmlCatalogPi"), "Allow catalog PI: {0}", ref allowCatalogPI);
 
-            property = section.GetSection("catalogCache");
-            if (property.Value != null) {
-                if (showConfigChanges) {
-                    logger.Log(ResolverLogger.CONFIG, "Cache directory: {0}", property.Value);
-                }
-                cacheDirectory = property.Value;
-            }
-
-            SetPropertyBoolean(section.GetSection("cacheUnderHome"), "Cache under home: {0}", ref cacheUnderHome);
-            SetPropertyBoolean(section.GetSection("cacheEnabled"), "Cache enabled: {0}", ref cacheEnabled);
             SetPropertyBoolean(section.GetSection("uriForSystem"), "URI-for-system: {0}", ref uriForSystem);
             SetPropertyBoolean(section.GetSection("mergeHttps"), "Merge https: {0}", ref mergeHttps);
             SetPropertyBoolean(section.GetSection("maskPackUris"), "Mask-pack-URIs: {0}", ref maskPackUris);
@@ -548,17 +518,6 @@ namespace Org.XmlResolver {
                 return;
             }
 
-            if (feature == ResolverFeature.CACHE_DIRECTORY) {
-                cacheDirectory = (string) value;
-                cache = null;
-                return;
-            }
-            
-            if (feature == ResolverFeature.CACHE) {
-                cache = (ResourceCache) value;
-                return;
-            } 
-            
             if (feature == ResolverFeature.ASSEMBLY_CATALOGS) {
                 if (value == null) {
                     assemblyCatalogs.Clear();
@@ -587,12 +546,6 @@ namespace Org.XmlResolver {
                 preferPropertyFile = (Boolean) value;
             } else if (feature == ResolverFeature.ALLOW_CATALOG_PI) {
                 allowCatalogPI = (Boolean) value;
-            } else if (feature == ResolverFeature.CACHE_UNDER_HOME) {
-                cacheUnderHome = (Boolean) value;
-                cache = null;
-            } else if (feature == ResolverFeature.CACHE_ENABLED) {
-                cacheEnabled = (Boolean) value;
-                cache = null;
             } else if (feature == ResolverFeature.CATALOG_MANAGER) {
                 manager = (CatalogManager) value;
             } else if (feature == ResolverFeature.URI_FOR_SYSTEM) {
@@ -684,8 +637,6 @@ namespace Org.XmlResolver {
                 return preferPropertyFile;
             } else if (feature == ResolverFeature.ALLOW_CATALOG_PI) {
                 return allowCatalogPI;
-            } else if (feature == ResolverFeature.CACHE_DIRECTORY) {
-                return cacheDirectory;
             } else if (feature == ResolverFeature.URI_FOR_SYSTEM) {
                 return uriForSystem;
             } else if (feature == ResolverFeature.MERGE_HTTPS) {
@@ -702,15 +653,6 @@ namespace Org.XmlResolver {
                 return assemblyCatalogs;
             } else if (feature == ResolverFeature.USE_DATA_ASSEMBLY) {
                 return useDataAssembly;
-            } else if (feature == ResolverFeature.CACHE) {
-                if (cache == null) {
-                    cache = new ResourceCache(this);
-                }
-                return cache;
-            } else if (feature == ResolverFeature.CACHE_UNDER_HOME) {
-                return cacheUnderHome;
-            } else if (feature == ResolverFeature.CACHE_ENABLED) {
-                return cacheEnabled;
             } else if (feature == ResolverFeature.FIX_WINDOWS_SYSTEM_IDENTIFIERS) {
                 return fixWindowsSystemIdentifiers;
             } else {

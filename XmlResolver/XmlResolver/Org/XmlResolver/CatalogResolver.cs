@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using NLog;
-using Org.XmlResolver.Cache;
 using Org.XmlResolver.Features;
 using Org.XmlResolver.Utils;
 
@@ -35,15 +34,9 @@ namespace Org.XmlResolver {
             this.config = config;
         }
 
-        private ResolvedResourceImpl Resource(string requestUri, Uri responseUri, CacheEntry cached) {
+        private ResolvedResourceImpl Resource(string requestUri, Uri responseUri) {
             try {
-                if (cached == null) {
-                    return UncachedResource(new Uri(requestUri), responseUri);
-                }
-
-                var fs = File.Open(cached.CacheFile.ToString(), FileMode.Open, FileAccess.Read);
-                return new ResolvedResourceImpl(responseUri, new Uri(cached.CacheFile.ToString()), fs,
-                    cached.ContentType());
+                return UncachedResource(new Uri(requestUri), responseUri);
             }
             catch (Exception ex) {
                 logger.Log(ResolverLogger.TRACE, "Failed to resolve {0}: {1}", requestUri, ex.Message);
@@ -112,13 +105,11 @@ namespace Org.XmlResolver {
                 }
             }
 
-            ResourceCache cache = (ResourceCache) config.GetFeature(ResolverFeature.CACHE);
-
             CatalogManager catalog = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
             Uri resolved = catalog.LookupUri(href);
             if (resolved != null) {
                 logger.Log(ResolverLogger.RESPONSE, "ResolveUri: {0}", resolved.ToString());
-                return Resource(href, resolved, cache.CachedUri(resolved));
+                return Resource(href, resolved);
             }
 
             string absolute = href;
@@ -128,20 +119,13 @@ namespace Org.XmlResolver {
                     resolved = catalog.LookupUri(absolute);
                     if (resolved != null) {
                         logger.Log(ResolverLogger.RESPONSE, "ResolveUri: {0}", resolved.ToString());
-                        return Resource(absolute, resolved, cache.CachedUri(resolved));
+                        return Resource(absolute, resolved);
                     }
                 }
             }
 
-            if (cache.CacheUri(absolute)) {
-                Uri absuri = new Uri(absolute);
-                logger.Log(ResolverLogger.RESPONSE, "ResolveUri: cached: {0}", absolute);
-                return Resource(absolute, absuri, cache.CachedUri(absuri));
-            }
-            else {
-                logger.Log(ResolverLogger.RESPONSE, "ResolvedUri: null");
-                return null;
-            }
+            logger.Log(ResolverLogger.RESPONSE, "ResolvedUri: null");
+            return null;
         }
 
         /// <summary>
@@ -169,13 +153,11 @@ namespace Org.XmlResolver {
                 }
             }
 
-            ResourceCache cache = (ResourceCache) config.GetFeature(ResolverFeature.CACHE);
-
             CatalogManager catalog = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
             Uri resolved = catalog.LookupNamespaceUri(href, nature, purpose);
             if (resolved != null) {
                 logger.Log(ResolverLogger.RESPONSE, "ResolveNamespace: {0}", resolved.ToString());
-                return Resource(href, resolved, cache.CachedUri(resolved));
+                return Resource(href, resolved);
             }
 
             string absolute = href;
@@ -185,20 +167,13 @@ namespace Org.XmlResolver {
                     resolved = catalog.LookupNamespaceUri(absolute, nature, purpose);
                     if (resolved != null) {
                         logger.Log(ResolverLogger.RESPONSE, "ResolveNamespace: {0}", resolved.ToString());
-                        return Resource(absolute, resolved, cache.CachedUri(resolved));
+                        return Resource(absolute, resolved);
                     }
                 }
             }
 
-            if (cache.CacheUri(absolute)) {
-                Uri absuri = new Uri(absolute);
-                logger.Log(ResolverLogger.RESPONSE, "ResolveNamespace: cached: {0}", absolute);
-                return Resource(absolute, absuri, cache.CachedUri(absuri));
-            }
-            else {
-                logger.Log(ResolverLogger.RESPONSE, "ResolvedNamespace: null");
-                return null;
-            }
+            logger.Log(ResolverLogger.RESPONSE, "ResolvedNamespace: null");
+            return null;
         }
 
         /// <summary>
@@ -244,8 +219,6 @@ namespace Org.XmlResolver {
             
             Uri absSystem = null;
 
-            ResourceCache cache = (ResourceCache) config.GetFeature(ResolverFeature.CACHE);
-
             CatalogManager catalog = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
             ResolvedResourceImpl result = null;
             Uri resolved = catalog.LookupEntity(name, systemId, publicId);
@@ -253,7 +226,7 @@ namespace Org.XmlResolver {
                 resolved = catalog.LookupUri(systemId);
             }
             if (resolved != null) {
-                result = Resource(systemId, resolved, cache.CachedSystem(resolved, publicId));
+                result = Resource(systemId, resolved);
             } else
             {
                 if (systemId != null) {
@@ -269,7 +242,7 @@ namespace Org.XmlResolver {
                         resolved = catalog.LookupUri(absSystem.ToString());
                     }
                     if (resolved != null) {
-                        result = Resource(absSystem.ToString(), resolved, cache.CachedSystem(resolved, publicId));
+                        result = Resource(absSystem.ToString(), resolved);
                     }
                 }
             }
@@ -284,11 +257,6 @@ namespace Org.XmlResolver {
                 return null;
             }
 
-            if (cache.CacheUri(absSystem.ToString())) {
-                logger.Log(ResolverLogger.RESPONSE, "resolveEntity: cached {0}", absSystem.ToString());
-                return Resource(absSystem.ToString(), absSystem, cache.CachedSystem(absSystem, publicId));
-            }
-
             logger.Log(ResolverLogger.RESPONSE, "resolveEntity: null");
             return null;
             
@@ -298,16 +266,8 @@ namespace Org.XmlResolver {
             logger.Log(ResolverLogger.REQUEST, "ResolveDoctype: {0}", name);
             CatalogManager catalog = (CatalogManager) config.GetFeature(ResolverFeature.CATALOG_MANAGER);
             Uri resolved = catalog.LookupDoctype(name, null, null);
-            if (resolved == null) {
-                logger.Log(ResolverLogger.RESPONSE, "resolveDoctype: null");
-                return null;
-            } else {
-                ResourceCache cache = (ResourceCache) config.GetFeature(ResolverFeature.CACHE);
-
-                logger.Log(ResolverLogger.RESPONSE, "resolveDoctype: {0}", resolved.ToString());
-                ResolvedResourceImpl result = Resource(null, resolved, cache.CachedSystem(resolved, null));
-                return result;
-            }
+            logger.Log(ResolverLogger.RESPONSE, "resolveDoctype: null");
+            return null;
         }
         
         /// <summary>

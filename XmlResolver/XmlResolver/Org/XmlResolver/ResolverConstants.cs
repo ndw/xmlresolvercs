@@ -14,5 +14,23 @@ namespace Org.XmlResolver {
         public static readonly string XML_NS = "http://www.w3.org/XML/1998/namespace";
         /** The XML Namespace name of XML Resolver Catalog extensions, "http://xmlresolver.org/ns/catalog". */
         public static readonly string XMLRESOURCE_EXT_NS = "http://xmlresolver.org/ns/catalog";
+        
+        public static readonly string PURPOSE_SCHEMA_VALIDATION = "http://www.rddl.org/purposes#schema-validation";
+        public static readonly string NATURE_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+        public static readonly string NATURE_XML_SCHEMA_1_1 = "http://www.w3.org/2001/XMLSchema/v1.1";
+        public static readonly string NATURE_RELAX_NG = "http://relaxng.org/ns/structure/1.0";
+           
+        public static readonly string TEXT_NATURE = "https://www.iana.org/assignments/media-types/text/plain";
+        public static readonly string BINARY_NATURE = "https://www.iana.org/assignments/media-types/application/octet-stream";
+        public static readonly string XML_NATURE = "https://www.iana.org/assignments/media-types/application/xml";
+        public static readonly string DTD_NATURE = "https://www.iana.org/assignments/media-types/application/xml-dtd";
+        public static readonly string SCHEMA_NATURE = "http://www.w3.org/2001/XMLSchema";
+        public static readonly string RELAXNG_NATURE = "http://relaxng.org/ns/structure/1.0";
+        public static readonly string EXTERNAL_ENTITY_NATURE = "https://www.iana.org/assignments/media-types/application/xml-external-parsed-entity";
+        public static readonly string ANY_NATURE = null;
+           
+        public static readonly string VALIDATION_PURPOSE = "http://www.rddl.org/purposes#validation";
+        public static readonly string ANY_PURPOSE = null;
+        
     }
 }

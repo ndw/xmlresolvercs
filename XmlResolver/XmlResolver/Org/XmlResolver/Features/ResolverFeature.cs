@@ -43,11 +43,6 @@ namespace Org.XmlResolver.Features {
             return resolverFeature;
         }
         
-        private static ResourceCacheResolverFeature register(ResourceCacheResolverFeature resolverFeature) {
-            _index.Add(resolverFeature.GetFeatureName(), resolverFeature);
-            return resolverFeature;
-        }
-        
         private static CatalogManagerResolverFeature register(CatalogManagerResolverFeature resolverFeature) {
             _index.Add(resolverFeature.GetFeatureName(), resolverFeature);
             return resolverFeature;
@@ -67,15 +62,6 @@ namespace Org.XmlResolver.Features {
 
         public static readonly BoolResolverFeature ALLOW_CATALOG_PI = register(new BoolResolverFeature(
             "http://xmlresolver.org/feature/allow-catalog-pi", true));
-
-        public static readonly StringResolverFeature CACHE_DIRECTORY = register(new StringResolverFeature(
-            "http://xmlresolver.org/feature/cache-directory",  null));
-
-        public static readonly BoolResolverFeature CACHE_UNDER_HOME = register(new BoolResolverFeature(
-            "http://xmlresolver.org/feature/cache-under-home", true));
-
-        public static readonly ResourceCacheResolverFeature CACHE = register(new ResourceCacheResolverFeature(
-            "http://xmlresolver.org/feature/cache", null));
 
         public static readonly CatalogManagerResolverFeature CATALOG_MANAGER = register(new CatalogManagerResolverFeature(
             "http://xmlresolver.org/feature/catalog-manager", null));
@@ -104,9 +90,6 @@ namespace Org.XmlResolver.Features {
         public static readonly BoolResolverFeature USE_DATA_ASSEMBLY = register(new BoolResolverFeature(
             "http://xmlresolver.org/feature/use-data-assembly", true));
             
-        public static readonly BoolResolverFeature CACHE_ENABLED = register(new BoolResolverFeature(
-            "http://xmlresolver.org/feature/cache-enbled", false));
-
         public static readonly BoolResolverFeature FIX_WINDOWS_SYSTEM_IDENTIFIERS = register(new BoolResolverFeature(
             "http://xmlresolver.org/feature/fix-windows-system-identifiers", false));
 

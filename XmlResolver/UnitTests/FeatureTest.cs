@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Org.XmlResolver;
-using Org.XmlResolver.Cache;
 using Org.XmlResolver.Features;
 
 namespace UnitTests {
@@ -40,12 +39,6 @@ namespace UnitTests {
         public void TestArchivedCatalogs() {
             Assert.True(config.GetFeatures().Contains(ResolverFeature.ARCHIVED_CATALOGS));
             BooleanFeature(ResolverFeature.ARCHIVED_CATALOGS);
-        }
-
-        [Test]
-        public void TestCacheUnderHome() {
-            Assert.True(config.GetFeatures().Contains(ResolverFeature.CACHE_UNDER_HOME));
-            BooleanFeature(ResolverFeature.CACHE_UNDER_HOME);
         }
 
         [Test]
@@ -109,12 +102,6 @@ namespace UnitTests {
             sameLists(current, myCatalogs);
 
             config.SetFeature(ResolverFeature.ASSEMBLY_CATALOGS, orig);
-        }
-
-        [Test]
-        public void TestCacheDirectory() {
-            Assert.True(config.GetFeatures().Contains(ResolverFeature.CACHE_DIRECTORY));
-            StringFeature(ResolverFeature.CACHE_DIRECTORY);
         }
 
         [Test]
@@ -194,16 +181,6 @@ namespace UnitTests {
             config.SetFeature(ResolverFeature.CATALOG_MANAGER, manager);
             Assert.AreSame(manager, config.GetFeature(ResolverFeature.CATALOG_MANAGER));
             config.SetFeature(ResolverFeature.CATALOG_MANAGER, orig);
-        }
-
-        [Test]
-        public void TestFeatureCache() {
-            Assert.True(config.GetFeatures().Contains(ResolverFeature.CACHE));
-            ResourceCache myCache = new ResourceCache(config);
-            ResourceCache orig = (ResourceCache)config.GetFeature(ResolverFeature.CACHE);
-            config.SetFeature(ResolverFeature.CACHE, myCache);
-            Assert.AreSame(myCache, config.GetFeature(ResolverFeature.CACHE));
-            config.SetFeature(ResolverFeature.CACHE, orig);
         }
     }
 }
