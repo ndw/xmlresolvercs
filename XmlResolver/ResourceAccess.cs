@@ -166,6 +166,19 @@ public static class ResourceAccess
         }
 
         var rsrc = new ResourceResponse(request, resolvedUri);
+        
+        var pos = ctype.IndexOf("charset=", StringComparison.Ordinal);
+        if (pos > 0)
+        {
+            var charset = ctype.Substring(pos + 8);
+            pos = charset.IndexOf(";", StringComparison.Ordinal);
+            if (pos > 0)
+            {
+                charset = charset.Substring(0, pos);
+            }
+            rsrc.Encoding = charset;
+        }
+        rsrc.ContentType = ctype;
         rsrc.SetHeaders(headers);
         rsrc.Stream = resp.Content.ReadAsStream();
         rsrc.StatusCode = 200;

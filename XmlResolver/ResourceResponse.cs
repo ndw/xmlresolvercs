@@ -15,7 +15,7 @@ public class ResourceResponse : IResourceResponse
     {
         Request = request;
         Rejected = false;
-        Uri = uri;
+        Uri = request.GetAbsoluteUri();
         ResolvedUri = uri;
         Resolved = uri != null;
     }

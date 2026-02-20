@@ -51,7 +51,7 @@ namespace UnitTests {
                 IResourceResponse rsrc = resolver.ResolveEntity(null, null, "https://example.com/sample/1.0/sample.dtd", null);
 
                 Assert.NotNull(rsrc.Stream);
-                Assert.AreEqual(result, rsrc.Uri);
+                Assert.AreEqual(result, rsrc.ResolvedUri);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
                 Assert.Fail();
@@ -63,9 +63,38 @@ namespace UnitTests {
             try {
                 Uri result = UriUtils.Resolve(TEST_ROOT_DIRECTORY, "UnitTests/resources/sample10/sample.dtd");
                 IResourceResponse rsrc = resolver.ResolveEntity(null, null, "https://example.com/sample/1.0/uri.dtd", null);
-
                 Assert.NotNull(rsrc.Stream);
-                Assert.AreEqual(result, rsrc.Uri);
+                Assert.AreEqual(result, rsrc.ResolvedUri);
+            } catch (Exception) {
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void LookupUri() {
+            try
+            {
+                IResourceResponse rsrc = resolver.ResolveUri("XMLSchema.xsd", "http://www.w3.org/TR/xmlschema11-1/");
+                Assert.NotNull(rsrc.Uri);
+                Assert.NotNull(rsrc.ResolvedUri);
+                Assert.NotNull(rsrc.Stream);
+                
+                Assert.AreEqual(new Uri("http://www.w3.org/TR/xmlschema11-1/XMLSchema.xsd"), rsrc.Uri);
+                Assert.AreEqual("pack", rsrc.ResolvedUri.Scheme);
+            } catch (Exception) {
+                Assert.Fail();
+            }
+        }
+
+        [Test]
+        public void LookupRedirectedUri() {
+            try
+            {
+                IResourceResponse rsrc = resolver.ResolveUri("https://www.w3.org/TR/1999/WD-font-19990902");
+                Assert.NotNull(rsrc.Uri);
+                Assert.NotNull(rsrc.ResolvedUri);
+                Assert.NotNull(rsrc.Stream);
+                Assert.NotNull(rsrc.Encoding);
             } catch (Exception) {
                 Assert.Fail();
             }

@@ -37,8 +37,8 @@ namespace UnitTests {
                 */
             Assert.NotNull(res);
             Assert.NotNull(res.Stream);
-            Assert.NotNull(res.Uri);
-            Assert.That(res.Uri.Scheme == "pack");
+            Assert.NotNull(res.ResolvedUri);
+            Assert.That(res.ResolvedUri.Scheme == "pack");
         }
         
         /*
